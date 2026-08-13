@@ -666,34 +666,6 @@ function toggleAbout(force) {
 // ====================================================================
 //  TOOL PANEL（换算 / 二维码 / 时钟）
 // ====================================================================
-let worldClockTimer = null;
-function openTool(view) {
-  const panel = document.getElementById('toolPanel');
-  panel.querySelectorAll('.tool-view').forEach(v => v.classList.toggle('active', v.dataset.view === view));
-  panel.classList.add('open');
-  document.body.classList.add('panel-open');
-  if (view === 'convert') initConvert();
-  if (view === 'qr') renderQR();
-  if (view === 'clock') startWorldClock();
-}
-function closeTool() {
-  const panel = document.getElementById('toolPanel');
-  panel.classList.remove('open');
-  document.body.classList.remove('panel-open');
-  if (worldClockTimer) { clearInterval(worldClockTimer); worldClockTimer = null; }
-}
-
-// ====================================================================
-//  TOOLS HUB（统一工具箱：网格入口 + 玻璃透明度滑动条）
-// ====================================================================
-function openToolsHub() {
-  document.getElementById('toolsPanel').classList.add('open');
-  document.body.classList.add('panel-open');
-}
-function closeToolsHub() {
-  document.getElementById('toolsPanel').classList.remove('open');
-  document.body.classList.remove('panel-open');
-}
 function applyGlassAlpha(a) {
   // a: 0~1，控制玻璃卡片通透度（液态玻璃质感）
   const isDark = document.documentElement.getAttribute('data-theme') === 'dark';
@@ -714,23 +686,6 @@ function applyGlassAlpha(a) {
   const slider = document.getElementById('glassSlider');
   if (slider) slider.style.setProperty('--glass-progress', (a * 100) + '%');
 }
-document.getElementById('toolsHubBtn').onclick = openToolsHub;
-document.getElementById('closeTools').onclick = closeToolsHub;
-document.getElementById('toolsPanel').addEventListener('click', e => { if (e.target === e.currentTarget || e.target.classList.contains('bg-dimmer')) closeToolsHub(); });
-document.querySelectorAll('.tool-item').forEach(item => {
-  item.onclick = () => {
-    const t = item.dataset.tool;
-    closeToolsHub();
-    const inp = document.getElementById('searchInput');
-    if (t === 'translate') { const v = inp.value || prompt('翻译内容：'); if (v) window.open(`https://translate.google.com/?text=${encodeURIComponent(v)}`, '_blank'); }
-    else if (t === 'calc') { inp.focus(); inp.placeholder = '输入算式如 (12+8)*3/2'; }
-    else if (t === 'sites') toggleShortcuts(true);
-    else if (t === 'notes') toggleNotes(true);
-    else if (t === 'convert') openTool('convert');
-    else if (t === 'qr') openTool('qr');
-    else if (t === 'clock') openTool('clock');
-  };
-});
 const glassSlider = document.getElementById('glassSlider');
 glassSlider.addEventListener('input', () => {
   const a = glassSlider.value / 100;
@@ -747,67 +702,6 @@ glassSlider.addEventListener('input', () => {
   applyGlassAlpha(saved / 100);
 })();
 
-// ---- 单位换算 ----
-const CONVERT_UNITS = {
-  length: { '米':1, '千米':1000, '厘米':0.01, '毫米':0.001, '英里':1609.344, '英尺':0.3048, '英寸':0.0254, '码':0.9144 },
-  weight: { '千克':1, '克':0.001, '毫克':1e-6, '吨':1000, '磅':0.453592, '盎司':0.0283495 },
-  temp:   { '摄氏度':1, '华氏度':1, '开尔文':1 },
-  area:   { '平方米':1, '平方千米':1e6, '平方厘米':0.0001, '公顷':10000, '亩':666.667, '英亩':4046.86, '平方英尺':0.092903 },
-  speed:  { '米/秒':1, '千米/时':0.277778, '英里/时':0.44704, '节':0.514444 },
-  time:   { '秒':1, '分钟':60, '小时':3600, '天':86400, '周':604800 }
-};
-function initConvert() {
-  const typeSel = document.getElementById('convertType');
-  const fromU = document.getElementById('convertFromUnit');
-  const toU = document.getElementById('convertToUnit');
-  const fill = sel => { sel.innerHTML = ''; Object.keys(CONVERT_UNITS[typeSel.value]).forEach(u => { const o = document.createElement('option'); o.value = u; o.textContent = u; sel.appendChild(o); }); };
-  fill(fromU); fill(toU);
-  if (toU.options.length > 1) toU.selectedIndex = 1;
-  const calc = () => {
-    const cat = CONVERT_UNITS[typeSel.value];
-    const v = parseFloat(document.getElementById('convertFrom').value);
-    if (isNaN(v)) { document.getElementById('convertTo').value = ''; return; }
-    const f = cat[fromU.value], t = cat[toU.value];
-    let res;
-    if (typeSel.value === 'temp') res = convertTemp(v, fromU.value, toU.value);
-    else res = v * f / t;
-    document.getElementById('convertTo').value = (Math.round(res * 1e6) / 1e6).toLocaleString();
-  };
-  typeSel.onchange = () => { fill(fromU); fill(toU); if (toU.options.length > 1) toU.selectedIndex = 1; calc(); };
-  fromU.onchange = calc; toU.onchange = calc;
-  document.getElementById('convertFrom').oninput = calc;
-  calc();
-}
-function convertTemp(v, from, to) {
-  let c = from === '摄氏度' ? v : from === '华氏度' ? (v - 32) * 5/9 : v - 273.15;
-  return to === '摄氏度' ? c : to === '华氏度' ? c * 9/5 + 32 : c + 273.15;
-}
-
-// ---- 二维码 ----
-let qrLastUrl = '';
-function renderQR() {
-  const text = document.getElementById('qrInput').value.trim();
-  const box = document.getElementById('qrBox');
-  if (!text) { box.innerHTML = '<span style="color:#888;font-size:13px">输入内容生成</span>'; qrLastUrl = ''; return; }
-  qrLastUrl = 'https://api.qrserver.com/v1/create-qr-code/?size=400x400&data=' + encodeURIComponent(text);
-  box.innerHTML = `<img src="${qrLastUrl}" alt="qrcode">`;
-}
-
-// ---- 世界时钟 ----
-const WORLD_CITIES = [
-  { name: '北京', tz: 'Asia/Shanghai' },
-  { name: '东京', tz: 'Asia/Tokyo' },
-  { name: '伦敦', tz: 'Europe/London' },
-  { name: '纽约', tz: 'America/New_York' },
-  { name: '巴黎', tz: 'Europe/Paris' },
-  { name: '洛杉矶', tz: 'America/Los_Angeles' }
-];
-function startWorldClock() {
-  const box = document.getElementById('worldClock');
-  const fmt = c => new Intl.DateTimeFormat('zh-CN', { timeZone: c.tz, hour: '2-digit', minute: '2-digit', second: '2-digit', hour12: false });
-  const tick = () => { box.innerHTML = WORLD_CITIES.map(c => `<div class="wc-item"><span class="wc-city">${c.name}</span><span class="wc-time">${fmt(c).format(new Date())}</span></div>`).join(''); };
-  tick(); worldClockTimer = setInterval(tick, 1000);
-}
 function toggleSettings(force) {
   const overlay = document.getElementById('settingsOverlay');
   const next = force !== undefined ? force : !overlay.classList.contains('open');
@@ -872,7 +766,6 @@ document.querySelectorAll('.quick-action-btn').forEach(btn => {
     if (a==='translate') { exitCalcMode(); const t = inp.value || prompt('翻译内容：'); if(t) window.open(`https://translate.google.com/?text=${encodeURIComponent(t)}`,'_blank'); }
     else if (a==='calc') { toggleCalcMode(); }
     else if (a==='sites') { exitCalcMode(); toggleShortcuts(true); }
-    else if (!a) { exitCalcMode(); openToolsHub(); }   // 统一"工具"按钮（无 data-action）
   };
 });
 
@@ -909,10 +802,6 @@ document.getElementById('clearDataBtn').onclick = () => { if(confirm('确定清�
 document.getElementById('closeShortcuts').onclick = () => toggleShortcuts(false);
 
 // 工具浮层事件
-document.querySelectorAll('[data-tool-close]').forEach(b => b.onclick = closeTool);
-document.getElementById('toolPanel').addEventListener('click', e => { if(e.target===e.currentTarget||e.target.classList.contains('bg-dimmer')) closeTool(); });
-document.getElementById('qrInput').addEventListener('input', renderQR);
-document.getElementById('qrDownload').onclick = () => { if(qrLastUrl){ const a=document.createElement('a'); a.href=qrLastUrl; a.download='qrcode.png'; a.click(); } };
 document.getElementById('modalCancel').onclick = () => document.getElementById('shortcutModal').classList.remove('open');
 
 document.getElementById('shortcutsPanel').addEventListener('click', e => { if(e.target===e.currentTarget||e.target.classList.contains('bg-dimmer')) toggleShortcuts(false); });
@@ -930,7 +819,7 @@ document.getElementById('ctxNotes').onclick = () => { hideContextMenu(); toggleN
 document.getElementById('ctxSettings').onclick = () => { hideContextMenu(); toggleSettings(true); };
 
 document.addEventListener('keydown', e => {
-  if(e.key==='Escape'){ exitCalcMode(); toggleShortcuts(false); toggleNotes(false); toggleSettings(false); closeTool(); closeToolsHub(); hideContextMenu(); document.getElementById('shortcutModal').classList.remove('open'); }
+  if(e.key==='Escape'){ exitCalcMode(); toggleShortcuts(false); toggleNotes(false); toggleSettings(false); hideContextMenu(); document.getElementById('shortcutModal').classList.remove('open'); }
   if(e.key==='/'&&!e.target.matches('input,textarea')){ e.preventDefault(); document.getElementById('searchInput').focus(); }
 });
 

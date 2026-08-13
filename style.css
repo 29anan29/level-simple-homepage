@@ -58,7 +58,6 @@
   --text-primary: #f4f4f8;
   --text-secondary: rgba(244, 244, 248, 0.78);
   --text-muted: rgba(244, 244, 248, 0.5);
-  .tools-card, .tool-view { background: var(--card-bg); border-color: var(--card-border); }
 }
 
 *, *::before, *::after { margin: 0; padding: 0; box-sizing: border-box; }
@@ -475,45 +474,6 @@ body.panel-open .main-content {
 .shortcut-add .add-icon svg { width: 24px; height: 24px; }
 
 
-/* ========== Tools Hub Panel（统一工具面板） ========== */
-.tools-panel {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 210;
-  display: flex; align-items: center; justify-content: center;
-  opacity: 0; visibility: hidden;
-  transition: opacity 0.35s ease, visibility 0.35s ease;
-}
-.tools-panel.open { opacity: 1; visibility: visible; }
-.tools-panel .bg-dimmer { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.22); z-index: 0; }
-.tools-card {
-  position: relative; z-index: 1;
-  width: 100%; max-width: 420px; margin: 0 20px;
-  background: var(--card-bg);
-  border: none;
-  border-radius: var(--radius);
-  backdrop-filter: blur(var(--blur)) saturate(180%);
-  -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
-  padding: 26px;
-  box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.20), 0 8px 32px rgba(0,0,0,0.06);
-  opacity: 0;
-  transition: opacity 0.28s ease;
-}
-.tools-panel.open .tools-card { opacity: 1; }
-.tools-card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.tools-card-title { font-size: 19px; font-weight: 600; color: var(--text-primary); }
-.tools-grid { display: grid; grid-template-columns: repeat(4, 1fr); gap: 12px; }
-.tool-item {
-  display: flex; flex-direction: column; align-items: center; gap: 8px;
-  padding: 16px 6px; border-radius: 14px; cursor: pointer;
-  background: rgba(255,255,255,0.05);
-  border: 1px solid transparent;
-  color: var(--text-primary);
-  transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease;
-}
-.tool-item svg { width: 24px; height: 24px; color: var(--accent); }
-.tool-item span { font-size: 12.5px; color: var(--text-secondary); }
-.tool-item:hover { background: rgba(255,255,255,0.12); border-color: var(--card-border); transform: translateY(-3px); }
-.tool-item:active { transform: translateY(-1px) scale(0.97); }
-
 .tools-slider { margin-top: 22px; padding-top: 18px; border-top: 1px solid var(--card-border); }
 .slider-label { display: flex; align-items: center; gap: 6px; font-size: 13.5px; color: var(--text-secondary); margin-bottom: 12px; }
 .slider-val { float: right; color: var(--accent); font-variant-numeric: tabular-nums; }
@@ -537,40 +497,6 @@ body.panel-open .main-content {
   width: 22px; height: 22px; border-radius: 50%; border: 1px solid rgba(255,255,255,0.6);
   background: rgba(255,255,255,0.9); box-shadow: 0 2px 10px rgba(0,0,0,0.35);
 }
-/* ========== Tool Panel（工具浮层） ========== */
-.tool-panel {
-  position: fixed; top: 0; left: 0; right: 0; bottom: 0; z-index: 200;
-  display: flex; flex-direction: column; align-items: center; justify-content: center;
-  padding: 60px 20px;
-  opacity: 0; visibility: hidden;
-  transition: opacity 0.35s ease, visibility 0.35s ease;
-  overflow-y: auto; -webkit-overflow-scrolling: touch;
-}
-.tool-panel.open { opacity: 1; visibility: visible; }
-.tool-panel .bg-dimmer { position: fixed; top: 0; left: 0; right: 0; bottom: 0; background: rgba(0,0,0,0.22); z-index: 0; }
-.tool-view { display: none; position: relative; z-index: 1; width: 100%; max-width: 440px; background: var(--card-bg); border: none; border-radius: var(--radius); backdrop-filter: blur(var(--blur)) saturate(160%); -webkit-backdrop-filter: blur(var(--blur)) saturate(160%); padding: 24px; box-shadow: inset 0 0 0 1px rgba(255,255,255,0.10), inset 0 1px 0 rgba(255,255,255,0.20), 0 8px 32px rgba(0,0,0,0.06); }
-.tool-view.active { display: block; animation: fadeIn 0.28s ease forwards; }
-.tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.tool-title { font-size: 17px; font-weight: 500; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
-.tool-body { display: flex; flex-direction: column; gap: 14px; }
-.tool-center { align-items: center; }
-
-.convert-row { display: flex; gap: 10px; }
-.convert-type, .convert-unit { background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: var(--text-primary); border-radius: 10px; padding: 10px 12px; font-size: 14px; outline: none; }
-.convert-type { width: 100%; }
-.convert-input { flex: 1; min-width: 0; background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: var(--text-primary); border-radius: 10px; padding: 10px 12px; font-size: 15px; outline: none; }
-.convert-input:focus, .convert-type:focus, .convert-unit:focus, .qr-input:focus { border-color: var(--accent); }
-.convert-eq { text-align: center; color: var(--text-secondary); font-size: 15px; }
-
-.qr-input { width: 100%; background: rgba(255,255,255,0.06); border: 1px solid var(--card-border); color: var(--text-primary); border-radius: 10px; padding: 10px 12px; font-size: 14px; outline: none; box-sizing: border-box; }
-.qr-box { width: 220px; height: 220px; background: #fff; border-radius: 12px; padding: 10px; display: flex; align-items: center; justify-content: center; }
-.qr-box img, .qr-box canvas { width: 100%; height: 100%; object-fit: contain; }
-
-.world-clock { display: flex; flex-direction: column; gap: 10px; }
-.wc-item { display: flex; justify-content: space-between; align-items: center; padding: 12px 14px; background: rgba(255,255,255,0.05); border: 1px solid var(--card-border); border-radius: 10px; }
-.wc-city { font-size: 14px; color: var(--text-secondary); }
-.wc-time { font-size: 20px; font-weight: 600; color: var(--text-primary); font-variant-numeric: tabular-nums; }
-
 /* ========== Notes Panel ========== */
 .notes-panel { position: fixed; right: -380px; top: 0; bottom: 0; width: 360px; max-width: 90vw; background: var(--card-bg); backdrop-filter: blur(var(--blur)) saturate(180%); -webkit-backdrop-filter: blur(var(--blur)) saturate(180%); border-left: none; z-index: 300; transition: right 0.4s cubic-bezier(0.4,0,0.2,1); display: flex; flex-direction: column; box-shadow: inset 1px 0 0 rgba(255,255,255,0.10), -8px 0 40px rgba(0,0,0,0.18); }
 .notes-panel.open { right: 0; }

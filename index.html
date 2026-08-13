@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>起始页</title>
-  <link rel="stylesheet" href="style.css?v=11">
+  <link rel="stylesheet" href="style.css?v=12">
 </head>
 <body>
   <!-- ===== Background ===== -->
@@ -81,31 +81,8 @@
           <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1"/><rect x="14" y="3" width="7" height="7" rx="1"/><rect x="14" y="14" width="7" height="7" rx="1"/><rect x="3" y="14" width="7" height="7" rx="1"/></svg>
           <span>导航</span>
         </div>
-        <!-- 统一工具入口 -->
-        <div class="quick-action-btn" id="toolsHubBtn">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></svg>
-          <span>工具</span>
-        </div>
       </div>
     </div>
-
-  <!-- ===== Tools Hub Panel（统一工具面板） ===== -->
-  <div class="tools-panel" id="toolsPanel">
-    <div class="bg-dimmer"></div>
-    <div class="tools-card">
-      <div class="tools-card-header">
-        <span class="tools-card-title">工具箱</span>
-        <button class="icon-btn" id="closeTools" title="关闭"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--icon-close);width:20px;height:20px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-      <div class="tools-grid">
-        <div class="tool-item" data-tool="notes"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/><line x1="10" y1="9" x2="8" y2="9"/></svg><span>便笺</span></div>
-        <div class="tool-item" data-tool="convert"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="8" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="3" x2="3" y2="9"/><line x1="3" y1="15" x2="3" y2="21"/></svg><span>换算</span></div>
-        <div class="tool-item" data-tool="qr"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="21"/><line x1="21" y1="14" x2="21" y2="21"/><line x1="14" y1="21" x2="21" y2="21"/></svg><span>二维码</span></div>
-        <div class="tool-item" data-tool="clock"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg><span>时钟</span></div>
-      </div>
-    </div>
-  </div>
-  </div>
 
   <!-- ===== Hitokoto（一言） ===== -->
   <div class="hitokoto-section" id="hitokotoSection">
@@ -129,8 +106,7 @@
     <div class="shortcuts-grid" id="shortcutsGrid"></div>
   </div>
 
-  <!-- ===== Tool Panel（通用工具浮层：换算 / 二维码 / 时钟） ===== -->
-  <!-- 天气详情浮层 -->
+  <!-- ===== Weather Detail Panel（天气详情浮层） ===== -->
   <div class="weather-detail-panel" id="weatherDetailPanel">
     <div class="bg-dimmer"></div>
     <div class="weather-detail-card">
@@ -146,69 +122,6 @@
         </div>
         <div class="wd-meta" id="wdMeta"></div>
         <div class="wd-forecast" id="wdForecast"></div>
-      </div>
-    </div>
-  </div>
-
-  <div class="tool-panel" id="toolPanel">
-    <div class="bg-dimmer"></div>
-    <!-- 换算 -->
-    <div class="tool-view" data-view="convert">
-      <div class="tool-header">
-        <div class="tool-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--icon-convert);width:20px;height:20px"><line x1="8" y1="6" x2="21" y2="6"/><line x1="3" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="3" x2="3" y2="9"/><line x1="3" y1="15" x2="3" y2="21"/></svg>
-          单位换算
-        </div>
-        <button class="icon-btn" data-tool-close title="关闭"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--icon-close);width:20px;height:20px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-      <div class="tool-body">
-        <div class="convert-row">
-          <select class="convert-type" id="convertType">
-            <option value="length">长度</option>
-            <option value="weight">重量</option>
-            <option value="temp">温度</option>
-            <option value="area">面积</option>
-            <option value="speed">速度</option>
-            <option value="time">时间</option>
-          </select>
-        </div>
-        <div class="convert-row">
-          <input class="convert-input" id="convertFrom" type="number" value="1" placeholder="数值">
-          <select class="convert-unit" id="convertFromUnit"></select>
-        </div>
-        <div class="convert-eq">=</div>
-        <div class="convert-row">
-          <input class="convert-input" id="convertTo" type="text" readonly placeholder="结果">
-          <select class="convert-unit" id="convertToUnit"></select>
-        </div>
-      </div>
-    </div>
-    <!-- 二维码 -->
-    <div class="tool-view" data-view="qr">
-      <div class="tool-header">
-        <div class="tool-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--icon-qr);width:20px;height:20px"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><line x1="14" y1="14" x2="14" y2="21"/><line x1="21" y1="14" x2="21" y2="21"/><line x1="14" y1="21" x2="21" y2="21"/></svg>
-          二维码生成
-        </div>
-        <button class="icon-btn" data-tool-close title="关闭"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--icon-close);width:20px;height:20px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-      <div class="tool-body tool-center">
-        <input class="qr-input" id="qrInput" type="text" placeholder="输入文本或网址，生成二维码" value="https://www.bing.com">
-        <div class="qr-box" id="qrBox"></div>
-        <button class="modal-btn modal-btn-confirm" id="qrDownload" style="width:auto;padding:10px 24px">下载</button>
-      </div>
-    </div>
-    <!-- 时钟 -->
-    <div class="tool-view" data-view="clock">
-      <div class="tool-header">
-        <div class="tool-title">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--icon-clock);width:20px;height:20px"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
-          世界时钟
-        </div>
-        <button class="icon-btn" data-tool-close title="关闭"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--icon-close);width:20px;height:20px"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg></button>
-      </div>
-      <div class="tool-body">
-        <div class="world-clock" id="worldClock"></div>
       </div>
     </div>
   </div>
@@ -404,6 +317,6 @@
 
   <input type="file" id="importFile" accept=".json" style="display:none">
 
-  <script src="app.js?v=5"></script>
+  <script src="app.js?v=6"></script>
 </body>
 </html>
