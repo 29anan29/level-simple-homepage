@@ -329,7 +329,7 @@ body.panel-open .main-content {
 .search-engine-selector.open .chevron { transform: rotate(180deg); }
 .engine-mini-icon { width: 20px; height: 20px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
 .engine-mini-icon svg { width: 20px; height: 20px; }
-.engine-mini-icon img { width: 20px; height: 20px; object-fit: contain; }
+.engine-mini-icon img { width: 20px; height: 20px; object-fit: contain; padding: 1px; background: #fff; border-radius: 5px; box-sizing: border-box; }
 
 /* Engine Dropdown —— 默认显示在上方，空间不足时显示在下方 */
 .engine-dropdown {
@@ -387,7 +387,7 @@ body.panel-open .main-content {
   flex-shrink: 0;
 }
 .engine-item .engine-icon svg { width: 24px; height: 24px; }
-.engine-item .engine-icon img { width: 24px; height: 24px; object-fit: contain; }
+.engine-item .engine-icon img { width: 24px; height: 24px; object-fit: contain; padding: 2px; background: #fff; border-radius: 6px; box-sizing: border-box; }
 
 /* Quick Actions */
 .quick-actions { display: flex; align-items: center; gap: 8px; margin-top: 16px; justify-content: center; flex-wrap: wrap; opacity: 0; animation: fadeInUp 0.8s 0.3s ease forwards; }
