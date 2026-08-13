@@ -435,7 +435,7 @@ body.panel-open .main-content {
   -webkit-overflow-scrolling: touch;
 }
 .shortcuts-panel.open { opacity: 1; visibility: visible; }
-.shortcuts-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 0; }
+.shortcuts-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.22); z-index: 0; }
 .shortcuts-header { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 800px; margin-bottom: 32px; flex-shrink: 0; }
 .shortcuts-title { font-size: 18px; font-weight: 500; color: var(--text-primary); }
 .shortcuts-grid { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; width: 100%; max-width: 800px; flex-shrink: 0; }
@@ -480,7 +480,7 @@ body.panel-open .main-content {
   transition: opacity 0.35s ease, visibility 0.35s ease;
 }
 .tools-panel.open { opacity: 1; visibility: visible; }
-.tools-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 0; }
+.tools-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.22); z-index: 0; }
 .tools-card {
   position: relative; z-index: 1;
   width: 100%; max-width: 420px; margin: 0 20px;
@@ -490,7 +490,7 @@ body.panel-open .main-content {
   backdrop-filter: blur(var(--blur)) saturate(180%);
   -webkit-backdrop-filter: blur(var(--blur)) saturate(180%);
   padding: 26px;
-  box-shadow: 0 16px 56px rgba(0,0,0,0.4), inset 0 1px 0 rgba(255,255,255,0.12);
+  box-shadow: 0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.12);
   opacity: 0;
   transition: opacity 0.28s ease;
 }
@@ -544,8 +544,8 @@ body.panel-open .main-content {
   overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 .tool-panel.open { opacity: 1; visibility: visible; }
-.tool-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 0; }
-.tool-view { display: none; position: relative; z-index: 1; width: 100%; max-width: 440px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); backdrop-filter: blur(var(--blur)) saturate(160%); -webkit-backdrop-filter: blur(var(--blur)) saturate(160%); padding: 24px; box-shadow: 0 12px 48px rgba(0,0,0,0.35); }
+.tool-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.22); z-index: 0; }
+.tool-view { display: none; position: relative; z-index: 1; width: 100%; max-width: 440px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); backdrop-filter: blur(var(--blur)) saturate(160%); -webkit-backdrop-filter: blur(var(--blur)) saturate(160%); padding: 24px; box-shadow: 0 8px 32px rgba(0,0,0,0.12), inset 0 1px 0 rgba(255,255,255,0.12); }
 .tool-view.active { display: block; animation: fadeIn 0.28s ease forwards; }
 .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .tool-title { font-size: 17px; font-weight: 500; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
