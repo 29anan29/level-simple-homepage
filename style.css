@@ -111,7 +111,6 @@ body.panel-open {
   object-position: center;
   display: block;
   opacity: 1;
-  transition: opacity 1.2s ease-in-out;
 }
 
 /* 细腻网格光晕，增加层次质感（覆盖在壁纸之上） */
@@ -329,7 +328,7 @@ body.panel-open .main-content {
 .search-engine-selector.open .chevron { transform: rotate(180deg); }
 .engine-mini-icon { width: 20px; height: 20px; flex-shrink: 0; display: inline-flex; align-items: center; justify-content: center; }
 .engine-mini-icon svg { width: 20px; height: 20px; }
-.engine-mini-icon img { width: 20px; height: 20px; object-fit: contain; padding: 1px; background: #fff; border-radius: 5px; box-sizing: border-box; }
+.engine-mini-icon img { width: 20px; height: 20px; object-fit: contain; }
 
 /* Engine Dropdown —— 默认显示在上方，空间不足时显示在下方 */
 .engine-dropdown {
@@ -387,7 +386,7 @@ body.panel-open .main-content {
   flex-shrink: 0;
 }
 .engine-item .engine-icon svg { width: 24px; height: 24px; }
-.engine-item .engine-icon img { width: 24px; height: 24px; object-fit: contain; padding: 2px; background: #fff; border-radius: 6px; box-sizing: border-box; }
+.engine-item .engine-icon img { width: 24px; height: 24px; object-fit: contain; }
 
 /* Quick Actions */
 .quick-actions { display: flex; align-items: center; gap: 8px; margin-top: 16px; justify-content: center; flex-wrap: wrap; opacity: 0; animation: fadeInUp 0.8s 0.3s ease forwards; }
@@ -435,7 +434,7 @@ body.panel-open .main-content {
   -webkit-overflow-scrolling: touch;
 }
 .shortcuts-panel.open { opacity: 1; visibility: visible; }
-.shortcuts-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); z-index: -1; }
+.shortcuts-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); z-index: 1; }
 .shortcuts-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 800px; margin-bottom: 32px; flex-shrink: 0; }
 .shortcuts-title { font-size: 18px; font-weight: 500; color: var(--text-primary); }
 .shortcuts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; width: 100%; max-width: 800px; flex-shrink: 0; }
@@ -480,7 +479,7 @@ body.panel-open .main-content {
   transition: opacity 0.35s ease, visibility 0.35s ease;
 }
 .tools-panel.open { opacity: 1; visibility: visible; }
-.tools-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); z-index: -1; }
+.tools-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); z-index: 1; }
 .tools-card {
   width: 100%; max-width: 420px; margin: 0 20px;
   background: var(--card-bg);
@@ -543,7 +542,7 @@ body.panel-open .main-content {
   overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 .tool-panel.open { opacity: 1; visibility: visible; }
-.tool-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); z-index: -1; }
+.tool-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); z-index: 1; }
 .tool-view { display: none; width: 100%; max-width: 440px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); backdrop-filter: blur(var(--blur)) saturate(160%); -webkit-backdrop-filter: blur(var(--blur)) saturate(160%); padding: 24px; box-shadow: 0 12px 48px rgba(0,0,0,0.35); }
 .tool-view.active { display: block; animation: scaleIn 0.3s ease forwards; }
 .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
