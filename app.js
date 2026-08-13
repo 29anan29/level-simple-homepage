@@ -17,7 +17,7 @@ const SI = 'logos';   // 本地图标目录，避免 CDN 404
 // ---- 搜索引擎（全部彩色图标，slug 对应 simple-icons）----
 const searchEngines = {
   google:      { name: 'Google',     url: 'https://www.google.com/search?q={query}',       slug: 'google',         color: '#4285F4' },
-  bing:        { name: '必应',       url: 'https://www.bing.com/search?q={query}',       slug: 'microsoftbing', color: '#00897B' },
+  bing:        { name: '必应',       url: 'https://www.bing.com/search?q={query}',       slug: 'bing', color: '#00897B' },
   baidu:       { name: '百度',       url: 'https://www.baidu.com/s?wd={query}',         slug: 'baidu',         color: '#2932E1' },
   duckduckgo:  { name: 'DuckDuckGo', url: 'https://duckduckgo.com/?q={query}',          slug: 'duckduckgo',    color: '#DE5833' },
   zhihu:       { name: '知乎',       url: 'https://www.zhihu.com/search?q={query}',     slug: 'zhihu',         color: '#056DE8' },
@@ -25,7 +25,7 @@ const searchEngines = {
   brave:       { name: 'Brave',      url: 'https://search.brave.com/search?q={query}', slug: 'brave',         color: '#FB542B' },
   yahoo:       { name: 'Yahoo',      url: 'https://search.yahoo.com/search?p={query}', slug: 'yahoo',         color: '#6001D2' },
   yandex:      { name: 'Yandex',     url: 'https://yandex.com/search/?text={query}',   slug: 'yandex',        color: '#FF0000' },
-  ask:         { name: 'Ask.com',    url: 'https://www.ask.com/web?q={query}',         slug: 'ask',          icon: 'data:image/svg+xml;utf8,%3Csvg%20xmlns%3D%27http%3A//www.w3.org/2000/svg%27%20viewBox%3D%270%200%2032%2032%27%3E%3Crect%20width%3D%2732%27%20height%3D%2732%27%20rx%3D%277%27%20fill%3D%27%231F57A3%27/%3E%3Ctext%20x%3D%2716%27%20y%3D%2722%27%20font-family%3D%27Arial%2CHelvetica%2Csans-serif%27%20font-size%3D%2715%27%20font-weight%3D%27700%27%20fill%3D%27white%27%20text-anchor%3D%27middle%27%3Eask%3C/text%3E%3C/svg%3E', color: '#1F57A3' },
+  ask:         { name: 'Ask.com',    url: 'https://www.ask.com/web?q={query}',         slug: 'ask',          icon: 'logos/ask.svg', color: '#1A6CF0' },
   aol:         { name: 'AOL',        url: 'https://search.aol.com/aol/search?q={query}', slug: 'aol',         color: '#009999' },
   naver:       { name: 'Naver',      url: 'https://search.naver.com/search.naver?query={query}', slug: 'naver', color: '#03C75A' },
   ecosia:      { name: 'Ecosia',     url: 'https://www.ecosia.org/search/?q={query}',  slug: 'ecosia',        color: '#003B1E' },
@@ -108,7 +108,7 @@ const defaultState = {
     accentColor: '#4ade80',
     showWeather: true,
     showHitokoto: true,
-    dailyWallpaper: true,
+    dailyWallpaper: false,
   },
   currentEngine: 'baidu',
 };
@@ -149,7 +149,7 @@ const slugMap = {
   'discord.com':'discord','spotify.com':'spotify','netflix.com':'netflix',
   'amazon.com':'amazon','apple.com':'apple','gitlab.com':'gitlab',
   'docker.com':'docker','npmjs.com':'npm','reddit.com':'reddit',
-  'google.com':'google','bing.com':'microsoftbing','duckduckgo.com':'duckduckgo',
+  'google.com':'google','bing.com':'bing','duckduckgo.com':'duckduckgo',
 };
 function autoSlug(url) {
   const host = url.replace(/^https?:\/\//,'').split('/')[0].toLowerCase();
@@ -222,17 +222,11 @@ async function getNetworkWallpaper() {
 
 async function setWallpaper() {
   const bgImg = document.getElementById('bgImg');
-  const url = state.settings.dailyWallpaper ? await getNetworkWallpaper() : null;
-  // 联网失败或关闭每日壁纸时，均回退到内置本地壁纸（保证永远有图）
-  const wallpaper = url || getLocalWallpaper();
-  // 换图时先淡出，加载完成再淡入；默认 img 即为可见，避免因 onload 未触发而长期空白
-  bgImg.style.opacity = '0';
-  bgImg.onload = () => { bgImg.style.opacity = '1'; };
-  bgImg.onerror = () => {
-    // 网络图彻底失败时，再回退到本地壁纸
-    if (wallpaper.startsWith('http')) bgImg.src = getLocalWallpaper();
-  };
-  bgImg.src = wallpaper;
+  const local = getLocalWallpaper();
+  // 始终使用本地壁纸，绝不依赖网络图，保证任何网络下都稳定显示、不空白、不闪烁、不叠层
+  bgImg.style.opacity = '1';
+  bgImg.onerror = () => { bgImg.style.opacity = '1'; };
+  bgImg.src = local;
 }
 
 // ====================================================================
@@ -330,6 +324,7 @@ const WEATHER_ICON_MAP = {
 };
 
 let weatherCity = '成都';
+let currentGlassAlpha = 0.4;
 let lastWeather = null;   // 缓存完整天气数据用于详情界面
 
 function setWeatherIcon(type) {
@@ -347,16 +342,13 @@ async function fetchWeather() {
   // 尝试定位
   if (weatherCity === '成都' && !sessionStorage.getItem('w_located')) {
     try {
-      const r = await fetch('https://ipapi.co/json/', { timeout: 3000 });
+      const ctrl = new AbortController();
+      const t = setTimeout(() => ctrl.abort(), 3500);
+      const r = await fetch('https://geolocation-db.com/json/', { signal: ctrl.signal });
+      clearTimeout(t);
       const d = await r.json();
       if (d && d.city) { weatherCity = d.city; sessionStorage.setItem('w_located','1'); }
-    } catch(e) {
-      try {
-        const r2 = await fetch('https://geolocation-db.com/json/');
-        const d2 = await r2.json();
-        if (d2 && d2.city) { weatherCity = d2.city; sessionStorage.setItem('w_located','1'); }
-      } catch(e2) {}
-    }
+    } catch(e) {}
   }
 
   // 获取坐标

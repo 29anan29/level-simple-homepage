@@ -66,12 +66,12 @@ html { width: 100%; }
 html, body {
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif;
   color: var(--text-primary);
-  /* 兜底背景：壁纸/遮罩未就绪或面板上移露出空隙时显示协调色，避免纯黑 */
-  background: #e8edf2;
+  /* 背景层(z-index:0)负责显示壁纸/兜底色；body 透明，避免白底盖住负层级背景 */
+  background: transparent;
   transition: background var(--transition);
 }
 [data-theme="dark"] html, [data-theme="dark"] body {
-  background: #101218;
+  background: transparent;
 }
 
 body {
@@ -94,7 +94,7 @@ body.panel-open {
 .bg-layer {
   position: fixed;
   inset: 0;
-  z-index: -2;
+  z-index: 0;
   overflow: hidden;
   /* 默认内联渐变壁纸，确保任何情况下都不会空白 */
   background-color: #1b2a4a;
@@ -133,16 +133,16 @@ body.panel-open {
 .bg-overlay {
   position: fixed;
   inset: 0;
-  z-index: -1;
+  z-index: 1;
   background:
     linear-gradient(to bottom, rgba(0,0,0,calc(var(--bg-overlay-a) * 0.4)) 0%, rgba(0,0,0,0) 28%, rgba(0,0,0,0) 60%, rgba(0,0,0,var(--bg-overlay-a)) 100%);
-  backdrop-filter: blur(2px);
   transition: background 0.4s cubic-bezier(0.22,0.61,0.36,1);
 }
 
 /* ========== Top Bar ========== */
 .top-bar {
   position: fixed;
+  z-index: 2;
   top: 0; left: 0; right: 0;
   display: flex;
   justify-content: space-between;
