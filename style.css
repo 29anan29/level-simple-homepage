@@ -435,10 +435,10 @@ body.panel-open .main-content {
   -webkit-overflow-scrolling: touch;
 }
 .shortcuts-panel.open { opacity: 1; visibility: visible; }
-.shortcuts-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); z-index: 1; }
-.shortcuts-header { display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 800px; margin-bottom: 32px; flex-shrink: 0; }
+.shortcuts-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); z-index: 0; }
+.shortcuts-header { position: relative; z-index: 1; display: flex; justify-content: space-between; align-items: center; width: 100%; max-width: 800px; margin-bottom: 32px; flex-shrink: 0; }
 .shortcuts-title { font-size: 18px; font-weight: 500; color: var(--text-primary); }
-.shortcuts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; width: 100%; max-width: 800px; flex-shrink: 0; }
+.shortcuts-grid { position: relative; z-index: 1; display: grid; grid-template-columns: repeat(auto-fill, minmax(100px, 1fr)); gap: 20px; width: 100%; max-width: 800px; flex-shrink: 0; }
 
 .shortcut-item { display: flex; flex-direction: column; align-items: center; gap: 10px; padding: 16px 8px; background: var(--card-bg); border: 1px solid var(--card-border); border-radius: var(--radius); backdrop-filter: blur(var(--blur)) saturate(160%); -webkit-backdrop-filter: blur(var(--blur)) saturate(160%); cursor: pointer; transition: all var(--transition); text-decoration: none; color: var(--text-primary); position: relative; animation: scaleIn 0.3s ease forwards; opacity: 0; overflow: hidden; }
 .shortcut-item::before {
@@ -480,8 +480,9 @@ body.panel-open .main-content {
   transition: opacity 0.35s ease, visibility 0.35s ease;
 }
 .tools-panel.open { opacity: 1; visibility: visible; }
-.tools-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); z-index: 1; }
+.tools-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); z-index: 0; }
 .tools-card {
+  position: relative; z-index: 1;
   width: 100%; max-width: 420px; margin: 0 20px;
   background: rgba(255,255,255,0.92);
   border: 1px solid rgba(0,0,0,0.08);
@@ -543,8 +544,8 @@ body.panel-open .main-content {
   overflow-y: auto; -webkit-overflow-scrolling: touch;
 }
 .tool-panel.open { opacity: 1; visibility: visible; }
-.tool-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); z-index: 1; }
-.tool-view { display: none; width: 100%; max-width: 440px; background: rgba(255,255,255,0.92); border: 1px solid rgba(0,0,0,0.08); border-radius: var(--radius); backdrop-filter: blur(var(--blur)) saturate(160%); -webkit-backdrop-filter: blur(var(--blur)) saturate(160%); padding: 24px; box-shadow: 0 12px 48px rgba(0,0,0,0.35); }
+.tool-panel .bg-dimmer { position: fixed; inset: 0; background: rgba(0,0,0,0.3); backdrop-filter: blur(6px); z-index: 0; }
+.tool-view { display: none; position: relative; z-index: 1; width: 100%; max-width: 440px; background: rgba(255,255,255,0.92); border: 1px solid rgba(0,0,0,0.08); border-radius: var(--radius); backdrop-filter: blur(var(--blur)) saturate(160%); -webkit-backdrop-filter: blur(var(--blur)) saturate(160%); padding: 24px; box-shadow: 0 12px 48px rgba(0,0,0,0.35); }
 .tool-view.active { display: block; animation: scaleIn 0.3s ease forwards; }
 .tool-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
 .tool-title { font-size: 17px; font-weight: 500; color: var(--text-primary); display: flex; align-items: center; gap: 8px; }
@@ -698,7 +699,7 @@ body.panel-open .main-content {
 }
 .weather-detail-panel.open { opacity: 1; visibility: visible; }
 .weather-detail-card {
-  position: relative;
+  position: relative; z-index: 1;
   width: 420px;
   max-width: 92vw;
   background: var(--card-bg);
