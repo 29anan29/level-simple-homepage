@@ -653,6 +653,16 @@ function toggleNotes(force) {
   if (next) renderNotes();
 }
 
+function toggleAbout(force) {
+  const panel = document.getElementById('aboutPanel');
+  const backdrop = document.getElementById('aboutBackdrop');
+  const next = force !== undefined ? force : !panel.classList.contains('open');
+  panel.classList.toggle('open', next);
+  backdrop.classList.toggle('open', next);
+  document.body.classList.toggle('panel-open', next);
+  if (next) { const d = document.getElementById('aboutDate'); if (d) d.textContent = new Date().toLocaleDateString(); }
+}
+
 // ====================================================================
 //  TOOL PANEL（换算 / 二维码 / 时钟）
 // ====================================================================
@@ -871,6 +881,10 @@ document.getElementById('engineSelector').addEventListener('click', e => { e.sto
 document.getElementById('themeBtn').onclick = () => { state.settings.theme = state.settings.theme==='dark'?'light':'dark'; saveState(); applyTheme(); };
 document.getElementById('notesBtn').onclick = () => toggleNotes();
 document.getElementById('closeNotes').onclick = () => toggleNotes(false);
+document.getElementById('aboutBtn').onclick = () => toggleAbout();
+document.getElementById('aboutCloseBtn').onclick = () => toggleAbout(false);
+document.getElementById('aboutBackdrop').onclick = () => toggleAbout(false);
+document.getElementById('aboutResetBtn').onclick = () => { if(confirm('确定重置所有数据？')){ localStorage.removeItem('startpage_state'); location.reload(); } };
 document.getElementById('noteAddBtn').onclick = () => { const v=document.getElementById('noteInput').value.trim(); if(v){state.notes.unshift(v);document.getElementById('noteInput').value='';saveState();renderNotes();} };
 
 document.getElementById('settingsBtn').onclick = () => toggleSettings(true);

@@ -4,7 +4,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>起始页</title>
-  <link rel="stylesheet" href="style.css?v=10">
+  <link rel="stylesheet" href="style.css?v=11">
 </head>
 <body>
   <!-- ===== Background ===== -->
@@ -34,6 +34,10 @@
       <!-- 设置按钮 - 紫色 -->
       <button class="icon-btn" id="settingsBtn" title="设置">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 0 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 0 1-4 0v-.09a1.65 1.65 0 0 0-1-1.51 1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 0 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 0 1 0-4h.09a1.65 1.65 0 0 0 1.51-1 1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 0 1 2.83-2.83l.06.06a1.65 1.65 0 0 0 1.82.33h0a1.65 1.65 0 0 0 1-1.51V3a2 2 0 0 1 4 0v.09a1.65 1.65 0 0 0 1 1.51h0a1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 0 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82v0a1.65 1.65 0 0 0 1.51 1H21a2 2 0 0 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>
+      </button>
+      <!-- 关于按钮 - 青柠色 -->
+      <button class="icon-btn" id="aboutBtn" title="关于">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="color:var(--accent)"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>
       </button>
     </div>
   </div>
@@ -376,8 +380,30 @@
     </div>
   </div>
 
+  <!-- ===== About Side Panel ===== -->
+  <div class="about-panel" id="aboutPanel">
+    <div class="about-header">
+      <h2>关于本页</h2>
+      <button class="about-close" id="aboutCloseBtn" title="关闭">✕</button>
+    </div>
+    <div class="about-body">
+      <div class="about-logo">🌐</div>
+      <h3>My Start Page</h3>
+      <p class="about-desc">一个极简、美观、可自定义的浏览器起始页。支持多搜索引擎、快捷导航、便笺、工具箱与本地天气。</p>
+      <div class="about-links">
+        <a href="https://github.com" target="_blank" rel="noopener">GitHub</a>
+        <a href="#" id="aboutResetBtn">重置数据</a>
+      </div>
+      <div class="about-meta">
+        <span>版本 v1.0.0</span>
+        <span id="aboutDate"></span>
+      </div>
+    </div>
+  </div>
+  <div class="about-backdrop" id="aboutBackdrop"></div>
+
   <input type="file" id="importFile" accept=".json" style="display:none">
 
-  <script src="app.js?v=4"></script>
+  <script src="app.js?v=5"></script>
 </body>
 </html>
