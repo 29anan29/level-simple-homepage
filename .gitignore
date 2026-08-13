@@ -1,0 +1,20 @@
+# 依赖
+node_modules/
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# 系统/编辑器
+.DS_Store
+Thumbs.db
+*.swp
+.idea/
+.vscode/
+
+# 本地临时
+*.log
+tmp/
+.tmp/
+
+# 保留 logos/（本地图标，防 CDN 404）
+!logos/
