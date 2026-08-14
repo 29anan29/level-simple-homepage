@@ -162,6 +162,28 @@ function hashCode(str) {
   return h;
 }
 
+// ====================================================================
+//  TOAST 通知
+// ====================================================================
+const TOAST_ICONS = {
+  success: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="20 6 9 17 4 12"/></svg>',
+  error: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><line x1="12" y1="16" x2="12.01" y2="16"/></svg>',
+  info: '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="10"/><line x1="12" y1="16" x2="12" y2="12"/><line x1="12" y1="8" x2="12.01" y2="8"/></svg>'
+};
+function showToast(message, type = 'info', duration = 2400) {
+  const container = document.getElementById('toastContainer');
+  if (!container) return;
+  const toast = document.createElement('div');
+  toast.className = `toast toast-${type}`;
+  toast.innerHTML = `${TOAST_ICONS[type] || TOAST_ICONS.info}<span>${message}</span>`;
+  container.appendChild(toast);
+  requestAnimationFrame(() => toast.classList.add('show'));
+  setTimeout(() => {
+    toast.classList.remove('show');
+    setTimeout(() => toast.remove(), 320);
+  }, duration);
+}
+
 function getLocalWallpaper() {
   // 优先使用本地真实风景照（离线/联网失败时的兜底壁纸），SVG 渐变作为最末兜底
   return 'wallpaper.jpg';
@@ -223,10 +245,23 @@ async function getNetworkWallpaper() {
 async function setWallpaper() {
   const bgImg = document.getElementById('bgImg');
   const local = getLocalWallpaper();
-  // 始终使用本地壁纸，绝不依赖网络图，保证任何网络下都稳定显示、不空白、不闪烁、不叠层
+  // 默认先加载本地壁纸，保证立刻可见、不空白、不闪烁
   bgImg.style.opacity = '1';
-  bgImg.onerror = () => { bgImg.style.opacity = '1'; };
+  bgImg.onerror = () => { bgImg.src = LOCAL_WALLPAPERS[0]; };
   bgImg.src = local;
+
+  // 若开启「每日壁纸」则异步尝试网络壁纸，成功后无缝替换
+  if (state.settings.dailyWallpaper) {
+    try {
+      const netUrl = await getNetworkWallpaper();
+      if (netUrl) {
+        // 预加载完成后再切换，避免闪烁
+        const img = new Image();
+        img.onload = () => { bgImg.src = netUrl; };
+        img.src = netUrl;
+      }
+    } catch (e) { /* 静默失败，保留本地壁纸 */ }
+  }
 }
 
 // ====================================================================
@@ -444,13 +479,16 @@ function setCalcMode(on) {
   calcMode = on;
   const inp = document.getElementById('searchInput');
   const btn = document.getElementById('calcBtn');
+  const box = document.getElementById('searchBox');
   if (on) {
     inp.placeholder = '输入算式，如 (12+8)*3/2（再点“计算”退出）';
     inp.focus();
-    if (btn) btn.classList.add('active');
+    if (btn) { btn.classList.add('active'); btn.setAttribute('aria-pressed','true'); }
+    if (box) box.classList.add('calc-mode');
   } else {
     inp.placeholder = SEARCH_PLACEHOLDER;
-    if (btn) btn.classList.remove('active');
+    if (btn) { btn.classList.remove('active'); btn.setAttribute('aria-pressed','false'); }
+    if (box) box.classList.remove('calc-mode');
   }
 }
 function toggleCalcMode() { setCalcMode(!calcMode); }
@@ -539,25 +577,33 @@ function shortcutIconHtml(sc) {
 function renderShortcuts() {
   const grid = document.getElementById('shortcutsGrid');
   const html = state.shortcuts.map((s,i) => `
-    <a class="shortcut-item" href="${s.url}" target="_blank" rel="noopener" style="animation-delay:${i*0.03}s">
-      <button class="shortcut-delete" data-idx="${i}" title="删除">
+    <div class="shortcut-item" data-url="${s.url}" style="animation-delay:${i*0.03}s" role="button" tabindex="0" aria-label="打开 ${s.name}">
+      <button class="shortcut-delete" data-idx="${i}" title="删除" aria-label="删除 ${s.name}">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>
       </button>
       <div class="shortcut-icon">${shortcutIconHtml(s)}</div>
       <div class="shortcut-name">${s.name}</div>
-    </a>`).join('') + `
-    <div class="shortcut-add" id="addShortcutBtn">
+    </div>`).join('') + `
+    <div class="shortcut-add" id="addShortcutBtn" role="button" tabindex="0" aria-label="添加快捷方式">
       <div class="add-icon">
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg>
       </div>
       <div class="shortcut-name">添加</div>
     </div>`;
   grid.innerHTML = html;
+  grid.querySelectorAll('.shortcut-item').forEach(item => {
+    const open = () => { const u = item.dataset.url; if (u) window.open(u, '_blank', 'noopener'); };
+    item.onclick = (e) => { if (e.target.closest('.shortcut-delete')) return; open(); };
+    item.onkeydown = (e) => { if ((e.key === 'Enter' || e.key === ' ') && !e.target.closest('.shortcut-delete')) { e.preventDefault(); open(); } };
+  });
   grid.querySelectorAll('.shortcut-delete').forEach(btn => {
     btn.onclick = (e) => { e.preventDefault(); e.stopPropagation(); state.shortcuts.splice(parseInt(btn.dataset.idx),1); saveState(); renderShortcuts(); };
   });
   const addBtn = grid.querySelector('#addShortcutBtn');
-  if (addBtn) addBtn.onclick = () => openShortcutModal();
+  if (addBtn) {
+    addBtn.onclick = () => openShortcutModal();
+    addBtn.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); openShortcutModal(); } };
+  }
 }
 
 function openShortcutModal(editIdx) {
@@ -575,15 +621,21 @@ function openShortcutModal(editIdx) {
     nameInput.value = ''; urlInput.value = ''; iconInput.value = '';
   }
   modal.classList.add('open'); nameInput.focus();
+  // 重置之前的错误状态
+  nameInput.style.borderColor = ''; urlInput.style.borderColor = '';
   document.getElementById('modalConfirm').onclick = () => {
     const name = nameInput.value.trim();
     let url = urlInput.value.trim();
     const slug = iconInput.value.trim().toLowerCase();
-    if (!name || !url) { nameInput.style.borderColor='rgba(255,80,80,0.5)'; urlInput.style.borderColor='rgba(255,80,80,0.5)'; return; }
+    let invalid = false;
+    if (!name) { nameInput.style.borderColor='rgba(248,113,113,0.6)'; invalid = true; } else { nameInput.style.borderColor = ''; }
+    if (!url) { urlInput.style.borderColor='rgba(248,113,113,0.6)'; invalid = true; } else { urlInput.style.borderColor = ''; }
+    if (invalid) { showToast('请填写名称和网址', 'error', 1800); return; }
     if (!/^https?:\/\//i.test(url)) url = 'https://' + url;
     const data = { name, url, slug: slug || autoSlug(url) || '' };
     if (editIdx !== undefined) state.shortcuts[editIdx] = data; else state.shortcuts.push(data);
     saveState(); renderShortcuts(); modal.classList.remove('open');
+    showToast(editIdx !== undefined ? '快捷方式已更新' : '快捷方式已添加', 'success', 1500);
   };
 }
 
@@ -592,10 +644,18 @@ function openShortcutModal(editIdx) {
 // ====================================================================
 function renderNotes() {
   const list = document.getElementById('noteList');
+  if (state.notes.length === 0) {
+    list.innerHTML = `<div class="empty-state">
+      <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"/><polyline points="14 2 14 8 20 8"/><line x1="16" y1="13" x2="8" y2="13"/><line x1="16" y1="17" x2="8" y2="17"/></svg>
+      <div class="empty-state-title">还没有便笺</div>
+      <div class="empty-state-desc">在上方输入框中记录你的灵感</div>
+    </div>`;
+    return;
+  }
   list.innerHTML = state.notes.map((n,i) => `
     <div class="note-item" style="animation-delay:${i*0.05}s">
-      <button class="note-delete" data-idx="${i}">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
+      <button class="note-delete" data-idx="${i}" aria-label="删除便笺">
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14H6L5 6"/><path d="M10 11v6"/><path d="M14 11v6"/><path d="M9 6V4a1 1 0 0 1 1-1h4a1 1 0 0 1 1 1v2"/></svg>
       </button>
       ${n.replace(/\n/g,'<br>')}
     </div>`).join('');
@@ -610,7 +670,11 @@ function renderNotes() {
 function applyTheme() {
   const isDark = state.settings.theme === 'dark';
   document.documentElement.setAttribute('data-theme', isDark ? 'dark' : 'light');
-  document.getElementById('darkModeToggle').classList.toggle('active', isDark);
+  const toggle = document.getElementById('darkModeToggle');
+  toggle.classList.toggle('active', isDark);
+  toggle.setAttribute('aria-checked', isDark ? 'true' : 'false');
+  const themeBtn = document.getElementById('themeBtn');
+  if (themeBtn) themeBtn.setAttribute('aria-pressed', isDark ? 'true' : 'false');
   const icon = document.getElementById('themeIcon');
   if (isDark) {
     // 月亮 - 橙黄色
@@ -689,6 +753,7 @@ function applyGlassAlpha(a) {
 const glassSlider = document.getElementById('glassSlider');
 glassSlider.addEventListener('input', () => {
   const a = glassSlider.value / 100;
+  currentGlassAlpha = a;   // 同步全局变量，避免主题切换时丢失
   document.getElementById('glassVal').textContent = glassSlider.value + '%';
   applyGlassAlpha(a);
   try { localStorage.setItem('glassAlpha', glassSlider.value); } catch (e) {}
@@ -699,7 +764,8 @@ glassSlider.addEventListener('input', () => {
   try { saved = parseInt(localStorage.getItem('glassAlpha')) || 40; } catch (e) {}
   glassSlider.value = saved;
   document.getElementById('glassVal').textContent = saved + '%';
-  applyGlassAlpha(saved / 100);
+  currentGlassAlpha = saved / 100;
+  applyGlassAlpha(currentGlassAlpha);
 })();
 
 function toggleSettings(force) {
@@ -743,13 +809,18 @@ function init() {
   document.getElementById('dailyWallpaperToggle').classList.toggle('active', state.settings.dailyWallpaper);
 
   document.querySelectorAll('.color-dot').forEach(dot => {
-    dot.classList.toggle('active', dot.dataset.color === state.settings.accentColor);
-    dot.onclick = () => {
+    const isActive = dot.dataset.color === state.settings.accentColor;
+    dot.classList.toggle('active', isActive);
+    dot.setAttribute('aria-checked', isActive ? 'true' : 'false');
+    const select = () => {
       state.settings.accentColor = dot.dataset.color;
       saveState(); applyAccentColor();
-      document.querySelectorAll('.color-dot').forEach(d => d.classList.remove('active'));
+      document.querySelectorAll('.color-dot').forEach(d => { d.classList.remove('active'); d.setAttribute('aria-checked','false'); });
       dot.classList.add('active');
+      dot.setAttribute('aria-checked', 'true');
     };
+    dot.onclick = select;
+    dot.onkeydown = (e) => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); select(); } };
   });
 }
 
@@ -770,6 +841,16 @@ document.querySelectorAll('.quick-action-btn').forEach(btn => {
 });
 
 document.getElementById('engineSelector').addEventListener('click', e => { e.stopPropagation(); toggleEngineDropdown(); });
+document.getElementById('engineSelector').addEventListener('keydown', e => {
+  if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); e.stopPropagation(); toggleEngineDropdown(); }
+  else if (e.key === 'Escape') { toggleEngineDropdown(false); }
+});
+
+document.querySelectorAll('.quick-action-btn').forEach(btn => {
+  btn.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); btn.click(); }
+  });
+});
 
 document.getElementById('themeBtn').onclick = () => { state.settings.theme = state.settings.theme==='dark'?'light':'dark'; saveState(); applyTheme(); };
 document.getElementById('notesBtn').onclick = () => toggleNotes();
@@ -777,27 +858,27 @@ document.getElementById('closeNotes').onclick = () => toggleNotes(false);
 document.getElementById('aboutBtn').onclick = () => toggleAbout();
 document.getElementById('aboutCloseBtn').onclick = () => toggleAbout(false);
 document.getElementById('aboutBackdrop').onclick = () => toggleAbout(false);
-document.getElementById('aboutResetBtn').onclick = () => { if(confirm('确定重置所有数据？')){ localStorage.removeItem('startpage_state'); location.reload(); } };
-document.getElementById('noteAddBtn').onclick = () => { const v=document.getElementById('noteInput').value.trim(); if(v){state.notes.unshift(v);document.getElementById('noteInput').value='';saveState();renderNotes();} };
+document.getElementById('aboutResetBtn').onclick = () => { if(confirm('确定重置所有数据？')){ localStorage.removeItem(STORAGE_KEY); try{ localStorage.removeItem('glassAlpha'); }catch(e){} location.reload(); } };
+document.getElementById('noteAddBtn').onclick = () => { const v=document.getElementById('noteInput').value.trim(); if(v){state.notes.unshift(v);document.getElementById('noteInput').value='';saveState();renderNotes(); showToast('便笺已添加', 'success', 1500);} else { showToast('请输入便笺内容', 'info', 1500); } };
 
 document.getElementById('settingsBtn').onclick = () => toggleSettings(true);
 document.getElementById('closeSettings').onclick = () => toggleSettings(false);
 
-document.getElementById('darkModeToggle').onclick = function(){ this.classList.toggle('active'); state.settings.theme=this.classList.contains('active')?'dark':'light'; saveState(); applyTheme(); };
-document.getElementById('weatherToggle').onclick = function(){ this.classList.toggle('active'); state.settings.showWeather=this.classList.contains('active'); saveState(); if(state.settings.showWeather) fetchWeather(); else document.getElementById('weatherWidget').style.display='none'; };
-document.getElementById('hitokotoToggle').onclick = function(){ this.classList.toggle('active'); state.settings.showHitokoto=this.classList.contains('active'); saveState(); updateHitokoto(); };
-document.getElementById('dailyWallpaperToggle').onclick = async function(){ this.classList.toggle('active'); state.settings.dailyWallpaper=this.classList.contains('active'); saveState(); setWallpaper(); };
+document.getElementById('darkModeToggle').onclick = function(){ this.classList.toggle('active'); const on=this.classList.contains('active'); this.setAttribute('aria-checked', on?'true':'false'); state.settings.theme=on?'dark':'light'; saveState(); applyTheme(); };
+document.getElementById('weatherToggle').onclick = function(){ this.classList.toggle('active'); const on=this.classList.contains('active'); this.setAttribute('aria-checked', on?'true':'false'); state.settings.showWeather=on; saveState(); if(on) fetchWeather(); else document.getElementById('weatherWidget').style.display='none'; };
+document.getElementById('hitokotoToggle').onclick = function(){ this.classList.toggle('active'); const on=this.classList.contains('active'); this.setAttribute('aria-checked', on?'true':'false'); state.settings.showHitokoto=on; saveState(); updateHitokoto(); };
+document.getElementById('dailyWallpaperToggle').onclick = async function(){ this.classList.toggle('active'); const on=this.classList.contains('active'); this.setAttribute('aria-checked', on?'true':'false'); state.settings.dailyWallpaper=on; saveState(); setWallpaper(); };
 document.getElementById('defaultEngineSelect').onchange = function(){ state.currentEngine = this.value; saveState(); renderEngineDropdown(); updateCurrentEngineDisplay(); };
 
-document.getElementById('exportBtn').onclick = () => { const b=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='startpage-config.json'; a.click(); URL.revokeObjectURL(u); };
+document.getElementById('exportBtn').onclick = () => { const b=new Blob([JSON.stringify(state,null,2)],{type:'application/json'}); const u=URL.createObjectURL(b); const a=document.createElement('a'); a.href=u; a.download='startpage-config.json'; a.click(); URL.revokeObjectURL(u); showToast('配置已导出', 'success'); };
 document.getElementById('importBtn').onclick = () => document.getElementById('importFile').click();
 document.getElementById('importFile').addEventListener('change', e => {
   const f = e.target.files[0]; if(!f) return;
   const r = new FileReader();
-  r.onload = ev => { try { const d=JSON.parse(ev.target.result); state={...defaultState,...d,settings:{...defaultState.settings,...(d.settings||{})},shortcuts:d.shortcuts||JSON.parse(JSON.stringify(defaultShortcuts))}; saveState(); location.reload(); } catch(err){ alert('配置文件格式错误'); } };
+  r.onload = ev => { try { const d=JSON.parse(ev.target.result); state={...defaultState,...d,settings:{...defaultState.settings,...(d.settings||{})},shortcuts:d.shortcuts||JSON.parse(JSON.stringify(defaultShortcuts))}; saveState(); showToast('配置已导入，正在刷新...', 'success'); setTimeout(()=>location.reload(), 600); } catch(err){ showToast('配置文件格式错误', 'error'); } };
   r.readAsText(f);
 });
-document.getElementById('clearDataBtn').onclick = () => { if(confirm('确定清空所有数据？不可恢复。')){ localStorage.removeItem(STORAGE_KEY); location.reload(); } };
+document.getElementById('clearDataBtn').onclick = () => { if(confirm('确定清空所有数据？此操作不可恢复。')){ localStorage.removeItem(STORAGE_KEY); try{ localStorage.removeItem('glassAlpha'); }catch(e){} showToast('数据已清空', 'success'); setTimeout(()=>location.reload(), 600); } };
 
 document.getElementById('closeShortcuts').onclick = () => toggleShortcuts(false);
 
@@ -819,7 +900,7 @@ document.getElementById('ctxNotes').onclick = () => { hideContextMenu(); toggleN
 document.getElementById('ctxSettings').onclick = () => { hideContextMenu(); toggleSettings(true); };
 
 document.addEventListener('keydown', e => {
-  if(e.key==='Escape'){ exitCalcMode(); toggleShortcuts(false); toggleNotes(false); toggleSettings(false); hideContextMenu(); document.getElementById('shortcutModal').classList.remove('open'); }
+  if(e.key==='Escape'){ exitCalcMode(); toggleShortcuts(false); toggleNotes(false); toggleSettings(false); toggleAbout(false); closeWeatherDetail(); toggleEngineDropdown(false); hideContextMenu(); document.getElementById('shortcutModal').classList.remove('open'); }
   if(e.key==='/'&&!e.target.matches('input,textarea')){ e.preventDefault(); document.getElementById('searchInput').focus(); }
 });
 
